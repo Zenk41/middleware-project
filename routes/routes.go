@@ -1,10 +1,11 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
-	mid "github.com/labstack/echo/v4/middleware"
 	c "middleware-project/controllers"
 	m "middleware-project/middlewares"
+
+	"github.com/labstack/echo/v4"
+	mid "github.com/labstack/echo/v4/middleware"
 )
 
 func New() *echo.Echo {
@@ -12,25 +13,31 @@ func New() *echo.Echo {
  // Middleware 
 	m.LogMiddleware(e)
 	// Login & Register
-	e.POST("/users/register", c.Register)
-	e.POST("/users/login", c.Login)
+	e.POST("/register", c.Register)
+	e.POST("/login", c.Login)
 	// Authentication
 	privateRoutes := e.Group("")
 	privateRoutes.Use(mid.JWTWithConfig(mid.JWTConfig{
 		SigningKey: []byte("secretToken"),
 	}))
 
+	// Checking Token
 	privateRoutes.Use(m.CheckToken)
+
 	// user routing
+	// Not Authenticated
+	e.POST("/users", c.CreateUserController) // Create User or Register
+	// Authenticated
 	privateRoutes.GET("/users", c.GetUsersController)
 	privateRoutes.GET("/users/:id", c.GetUserController)
-	e.POST("/users", c.CreateUserController)
 	privateRoutes.DELETE("/users/:id", c.DeleteUserController)
 	privateRoutes.PUT("/users/:id", c.UpdateUserController)
 
 	// book routing
-	privateRoutes.GET("/books", c.GetBooksController)
+	// Not Authenticated
+	e.GET("/books", c.GetBooksController)
 	e.GET("/books/:id", c.GetBookController)
+	// Authenticated
 	privateRoutes.POST("/books", c.CreateBookController)
 	privateRoutes.DELETE("/books/:id", c.DeleteBookController)
 	privateRoutes.PUT("/books/:id", c.UpdateBookController)

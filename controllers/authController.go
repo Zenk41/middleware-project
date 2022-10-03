@@ -18,7 +18,7 @@ func Register(c echo.Context) error {
 			"message": "invalid request",
 		})
 	}
-	if err := UserInput; err != nil {
+	if err := UserInput.Validate(); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "validation failed",
 		})
@@ -28,7 +28,10 @@ func Register(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusCreated, user)
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"message": "success register new user",
+		"user":    user,
+	})
 }
 
 func Login(c echo.Context) error {

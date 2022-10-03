@@ -1,11 +1,10 @@
 package middlewares
 
 import (
-	"middleware-project/constants"
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,15 +14,16 @@ func CreateToken(userId uint) (string, error) {
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(constants.SECRET_JWT_TOKEN))
+	return token.SignedString([]byte("secretToken"))
 }
 
 func ExtractToken(e echo.Context) uint {
 	user := e.Get("user").(*jwt.Token)
+
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
-		userId := claims["id"].(uint)
-		return userId
+		userId := claims["userId"].(float64)
+		return uint(userId)
 	}
 	return 0
 }

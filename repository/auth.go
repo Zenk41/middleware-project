@@ -1,8 +1,8 @@
 package repository
 
 import (
-	mid "middleware-project/middlewares"
 	"middleware-project/database"
+	mid "middleware-project/middlewares"
 	"middleware-project/models"
 
 	"golang.org/x/crypto/bcrypt"
@@ -28,7 +28,7 @@ func (a *AuthRepo) Register(input models.UserInput)( *models.User , error){
 func (a *AuthRepo) Login(input models.UserLogin) string {
 	var user models.User = models.User{}
 
-	if err := database.DB.First(&user, "email=?", input.Email); err != nil{
+	if err := database.DB.First(&user, "email=?", input.Email).Error; err != nil{
 		return ""
 	}
 	if user.ID == 0 {

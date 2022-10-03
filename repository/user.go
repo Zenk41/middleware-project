@@ -3,6 +3,8 @@ package repository
 import (
 	"middleware-project/database"
 	"middleware-project/models"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepo struct{}
@@ -27,19 +29,19 @@ func (u *UserRepo) GetUserById(id int) (*models.User, error) {
 }
 
 // create new user
-func (u *UserRepo) CreateUser(input models.UserInput) (*models.User, error) {
+// func (u *UserRepo) CreateUser(input models.UserInput) (*models.User, error) {
+// 	var newUser models.User = models.User{
+// 		Name: input.Name,
+// 		Email: input.Email,
+// 		Password: input.Password,
+// 	}
+// 	if err := database.DB.Create(&newUser).Error; err != nil{
+// 		return nil, err
+// 	}
+// 	return &newUser, nil
+// }
+// Changing Createuser to Register on the auth
 
-	var newUser models.User = models.User{
-		Name:     input.Name,
-		Email:    input.Email,
-		Password: input.Password,
-	}
-	if err := database.DB.Save(&newUser).Error; err != nil {
-		return nil, err
-	}
-
-	return &newUser, nil
-}
 
 // update user by id
 func (u *UserRepo) UpdateUser(id int, input models.UserInput) (*models.User, error) {
@@ -47,9 +49,10 @@ func (u *UserRepo) UpdateUser(id int, input models.UserInput) (*models.User, err
 	if err != nil {
 		return nil, err
 	}
+	password, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	user.Name = input.Name
 	user.Email = input.Email
-	user.Password = input.Password
+	user.Password = string(password)
 	if err := database.DB.Save(&user).Error ; err != nil {
 		return nil, err
 	}

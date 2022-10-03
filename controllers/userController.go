@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+
 // get all users
 func GetUsersController(c echo.Context) error {
 	users, err := services.GetUsers()
@@ -39,14 +40,23 @@ func GetUserController(c echo.Context) error {
 
 // create new user
 func CreateUserController(c echo.Context) error {
-	user := models.User{}
- c.Bind(&user)
-	users, err := services.CreateUser(user)
+	var UserInput *models.UserInput = new(models.UserInput)
+	if err := c.Bind(UserInput); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid request",
+		})
+	}
+	if err := UserInput.Validate(); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "validation failed",
+		})
+	}
+	users, err := authService.Register(*UserInput)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success create new user",
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"message": "success creating new user",
 		"user":    users,
 	})
 }

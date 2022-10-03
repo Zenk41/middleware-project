@@ -24,12 +24,12 @@ func GetUserById(id int) (interface{}, error) {
 }
 
 // create new user
-func CreateUser(user models.User) (interface{}, error) {
-	if err := database.DB.Save(&user).Error; err != nil {
-		return nil, err
-	}
-	return user, nil
-}
+// func CreateUser(user models.User) (interface{}, error) {
+// 	if err := database.DB.Create(&user).Error; err != nil {
+// 		return nil, err
+// 	}
+// 	return user, nil
+// } Changing Createuser to Register
 
 // update user by id
 func UpdateUser(id int, user models.User) (interface{}, error) {
